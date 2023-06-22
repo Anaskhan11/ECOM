@@ -5,7 +5,7 @@ import JWT from "jsonwebtoken";
 export const registerController = async (req, res) => {
   try {
     console.log(JSON.stringify(req.body));
-    const { name, email, password, phone, address } = req.body;
+    const { name, email, password, phone, address, answer } = req.body;
     // Validation
     if (!name) {
       return res.send({ message: "Name is required" });
@@ -21,6 +21,9 @@ export const registerController = async (req, res) => {
     }
     if (!address) {
       return res.send({ message: "Address is required" });
+    }
+    if (!answer) {
+      return res.send({ message: "Answer is required" });
     }
     // Validation for Check User && Existing User
     const existingUser = await userModel.findOne({ email });
@@ -40,6 +43,7 @@ export const registerController = async (req, res) => {
       email,
       phone,
       address,
+      answer,
       password: hashedPassword,
     }).save();
 
@@ -104,6 +108,44 @@ export const loginController = async (req, res) => {
     res.status(500).send({
       sucess: false,
       message: "Error in Login",
+      error,
+    });
+  }
+};
+
+// forgot passward
+export const forgotPasswordController = async (req, res) => {
+  try {
+    const { email, answer, newPassword } = req.body;
+    if (!email) {
+      return res.send({ message: "Email is required" });
+    }
+    if (!answer) {
+      return res.send({ message: "Answer is required" });
+    }
+    if (!newPassword) {
+      return res.send({ message: "newPassword is required" });
+    }
+
+    // Check Email And Answer
+    const user = await userModel.findOne({ email, answer });
+    if (!user) {
+      return res.status(404).send({
+        sucess: false,
+        message: "Wrong Email or Answer",
+      });
+    }
+    const hashed = await hashPassword(newPassword);
+    await userModel.findByIdAndUpdate(user._id, { password: hashed });
+    res.status(200).send({
+      sucess: true,
+      message: "Password Reset Sucessfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      sucess: false,
+      message: "Something went wrong",
       error,
     });
   }
