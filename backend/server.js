@@ -4,7 +4,8 @@ import morgan from "morgan";
 import colors from "colors";
 import Connection from "./config/DBConnection.js";
 import authRoutes from "./routes/authRoutes.js";
-import bodyParser from "body-parser";
+import categoryRoute from "./routes/categoryRoute.js";
+import productRoutes from "./routes/productRoutes.js";
 import cors from "cors";
 
 const app = express();
@@ -19,6 +20,8 @@ app.use(morgan("dev"));
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/category", categoryRoute);
+app.use("/api/v1/product", productRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on Port ${process.env.PORT}`.bgCyan.white);
