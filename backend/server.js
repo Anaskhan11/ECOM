@@ -13,7 +13,13 @@ const app = express();
 dotenv.config({ path: "config/Config.env" });
 Connection();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://deploy-mern-lwhq.vercel.app"],
+    methods: ["POST", "GET", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  })
+);
 //app.use(bodyParser.json());
 app.use(express.json());
 app.use(morgan("dev"));
